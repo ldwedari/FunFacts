@@ -80,11 +80,21 @@ namespace FunFacts.Repositories
             using (var db = dbFactory())
             {
                 fact.ModifiedWhen = DateTime.Now;
-                fact.ModifiedBy = HttpContext.Current?.User?.Identity?.Name ?? "Anonymous";
+                fact.ModifiedBy = GetIdentity();
                 var result = db.ChuckNorrisFunFacts.Add(fact as ChuckNorrisFunFact);
                 db.SaveChanges();
                 return result;
             }
+        }
+
+        private string GetIdentity()
+        {
+            var result = HttpContext.Current?.User?.Identity?.Name;
+            if (string.IsNullOrEmpty(result))
+            {
+                result = "Anonymous";
+            }
+            return result;
         }
 
         /// <summary>
@@ -99,7 +109,7 @@ namespace FunFacts.Repositories
             using (var db = dbFactory())
             {
                 fact.ModifiedWhen = DateTime.Now;
-                fact.ModifiedBy = HttpContext.Current?.User?.Identity?.Name ?? "Anonymous";
+                fact.ModifiedBy = GetIdentity();
                 var entity = db.ModifiedEntity(fact as ChuckNorrisFunFact);
                 db.SaveChanges();
                 return entity;
