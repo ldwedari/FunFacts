@@ -1,24 +1,69 @@
-﻿<div class="jumbotron">
-    <h1>ASP.NET</h1>
-    <p class="lead">ASP.NET is a free web framework for building great Web sites and Web applications using HTML, CSS, and JavaScript.</p>
-    <p><a href="https://asp.net" class="btn btn-primary btn-lg">Learn more &raquo;</a></p>
-</div>
-<div class="row">
+﻿<div class="row">
     <div class="col-md-4">
-        <h2>Getting started</h2>
-        <p>ASP.NET Web API is a framework that makes it easy to build HTTP services that reach
-        a broad range of clients, including browsers and mobile devices. ASP.NET Web API
-        is an ideal platform for building RESTful applications on the .NET Framework.</p>
-        <p><a class="btn btn-default" href="https://go.microsoft.com/fwlink/?LinkId=301870">Learn more &raquo;</a></p>
-    </div>
-    <div class="col-md-4">
-        <h2>Get more libraries</h2>
-        <p>NuGet is a free Visual Studio extension that makes it easy to add, remove, and update libraries and tools in Visual Studio projects.</p>
-        <p><a class="btn btn-default" href="https://go.microsoft.com/fwlink/?LinkId=301871">Learn more &raquo;</a></p>
-    </div>
-    <div class="col-md-4">
-        <h2>Web Hosting</h2>
-        <p>You can easily find a web hosting company that offers the right mix of features and price for your applications.</p>
-        <p><a class="btn btn-default" href="https://go.microsoft.com/fwlink/?LinkId=301872">Learn more &raquo;</a></p>
+        <div>Run tests (open the browser console).</div>
+        <button class="btn btn-primary" id="clickme">Run Tests</button>
     </div>
 </div>
+<pre id ="json" class="well">
+
+</pre>
+<script>
+    $(document).ready(function () {
+        function getRandom() {
+            $("#json").text("");
+            $.get("/api/ChuckNorrisFunFacts", {}).
+                done(function (model) {
+                    $("#json").append("getRandom " + JSON.stringify(model, null, 2) + "\n");
+                    $.get("/api/ChuckNorrisFunFacts", { count: 2 },
+                        function (model) {
+                            $("#json").append("getTop 2" + JSON.stringify(model, null, 2) + "\n");
+                            newFact = { "Fact": "Some Fact3", "Rating": 10, "ModifiedWhen": "2017-08-01T00:00:00", "ModifiedBy": "Me" };
+                            $.post("/api/ChuckNorrisFunFacts", newFact)
+                                .done(function (model) {
+                                    newFact2 = model;
+                                    $("#json").append("post " + JSON.stringify(model, null, 2) + "\n");
+                                })
+                                .done(function (model) {
+                                    $.get("/api/ChuckNorrisFunFacts", { count: 20 },
+                                        function (model) {
+                                            $("#json").append("getTop 20 " + JSON.stringify(model, null, 2) + "\n");
+                                        });
+                                    newFact2.Fact = "Some Fact3 Changed";
+                                    $.ajax({
+                                        url: '/api/ChuckNorrisFunFacts/' + model.Id,
+                                        type: 'PUT',
+                                        contentType: "application/json; charset=utf-8",
+                                        data: JSON.stringify(newFact2),
+                                        dataType: 'json'
+                                    })
+                                        .done(function (model) {
+                                            $("#json").append("put " + JSON.stringify(model, null, 2) + "\n");
+                                        })
+                                        .done(function (model) {
+                                            $.get("/api/ChuckNorrisFunFacts", { count: 20 },
+                                                function (model) {
+                                                    $("#json").append("getTop 20 " + JSON.stringify(model, null, 2) + "\n");
+                                                })
+                                        })
+                                        .done(function (model) {
+                                            $.ajax({
+                                                url: '/api/ChuckNorrisFunFacts/' + model.Id,
+                                                type: 'DELETE',
+                                                contentType: "application/json; charset=utf-8",
+                                            })
+                                                .done(function () {
+                                                    $("#json").append("deleted." + model.Id + "\n");
+                                                });
+                                        })
+                                })
+                                .done(function () {
+                                });
+                        });
+                });
+        }
+        $("#clickme").click(function (){
+            getRandom();
+        });
+    });
+</script>
+

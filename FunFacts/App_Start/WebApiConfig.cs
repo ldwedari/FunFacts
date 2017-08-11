@@ -5,6 +5,7 @@ using System.Net.Http;
 using System.Web.Http;
 using Microsoft.Owin.Security.OAuth;
 using Newtonsoft.Json.Serialization;
+using FunFacts.Filters;
 
 namespace FunFacts
 {
@@ -16,7 +17,7 @@ namespace FunFacts
             // Configure Web API to use only bearer token authentication.
             config.SuppressDefaultHostAuthentication();
             config.Filters.Add(new HostAuthenticationFilter(OAuthDefaults.AuthenticationType));
-
+            GlobalConfiguration.Configuration.Filters.Add(new BoundaryExceptionFilterAttribute());
             // Web API routes
             config.MapHttpAttributeRoutes();
 
@@ -25,6 +26,13 @@ namespace FunFacts
                 routeTemplate: "api/{controller}/{id}",
                 defaults: new { id = RouteParameter.Optional }
             );
+
+            SetupDependencyInjection(config);
+        }
+
+        private static void SetupDependencyInjection(HttpConfiguration config)
+        {
+            
         }
     }
 }
